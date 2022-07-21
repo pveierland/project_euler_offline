@@ -1,0 +1,39 @@
+\section[Problem \#149: Searching for a maximum-sum subsequence]{Searching for a maximum-sum subsequence}
+\label{sec:problem_149}
+
+Looking at the table below, it is easy to verify that the maximum
+possible sum of adjacent numbers in any direction (horizontal, vertical,
+diagonal or anti-diagonal) {is 16 (= 8 + 7 + 1).}
+
+\begin{longtable}[]{@{}rrrr@{}}
+\toprule
+\endhead
+−2 & 5 & 3 & 2 \\
+9 & −6 & 5 & 1 \\
+3 & 2 & 7 & 3 \\
+−1 & 8 & −4 & ~ 8 \\
+\bottomrule
+\end{longtable}
+
+Now, let us repeat the search, but on a much larger scale:
+
+First, generate four million pseudo-random numbers using a specific form
+of what is known as a "Lagged Fibonacci Generator":
+
+For 1 ≤ \emph{k} ≤ 55, \emph{s}\textsubscript{\emph{k}} = {[}100003 −
+200003\emph{k} + 300007\emph{k}\textsuperscript{3}{]} (modulo 1000000) −
+500000.\\
+For 56 ≤ \emph{k} ≤ 4000000, \emph{s}\textsubscript{\emph{k}} =
+{[}\emph{s}\textsubscript{\emph{k−24}} +
+\emph{s}\textsubscript{\emph{k−55}} + 1000000{]} (modulo 1000000) −
+500000.
+
+Thus, \emph{s}\textsubscript{10} = −393027 and
+\emph{s}\textsubscript{100} = 86613.
+
+The terms of \emph{s} are then arranged in a 2000×2000 table, using the
+first 2000 numbers to fill the first row (sequentially), the next 2000
+numbers to fill the second row, and so on.
+
+Finally, find the greatest sum of (any number of) adjacent entries in
+any direction (horizontal, vertical, diagonal or anti-diagonal).

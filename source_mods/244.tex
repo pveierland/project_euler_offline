@@ -1,0 +1,60 @@
+\section[Problem \#244: Sliders]{Sliders}
+\label{sec:problem_244}
+
+You probably know the game \emph{Fifteen Puzzle}. Here, instead of
+numbered tiles, we have seven red tiles and eight blue tiles.
+
+A move is denoted by the uppercase initial of the direction (Left,
+Right, Up, Down) in which the tile is slid, e.g. starting from
+configuration (\textbf{S}), by the sequence \textbf{LULUR} we reach the
+configuration (\textbf{E}):
+
+\begin{longtable}[]{@{}m{1cm}m{4cm}m{1cm}m{4cm}@{}}
+\toprule
+\endhead
+(\textbf{S}) & \includegraphics{project/images/p244_start.gif} &
+,~(\textbf{E}) & \includegraphics{project/images/p244_example.gif} \\
+\bottomrule
+\end{longtable}
+
+For each path, its checksum is calculated by (pseudocode):
+
+checksum = 0\\
+checksum = (checksum × 243 + \texttt{m}\textsubscript{1}) mod
+100 000 007\\
+checksum = (checksum × 243 + \texttt{m}\textsubscript{2}) mod
+100 000 007\\
+\hspace*{0.333em}\hspace*{0.333em}\hspace*{0.333em}\ldots{}\\
+checksum = (checksum × 243 + \texttt{m}\textsubscript{\texttt{n}}) mod
+100 000 007\\
+
+where \texttt{m}\textsubscript{\texttt{k}} is the ASCII value of the
+\texttt{k}\textsuperscript{\texttt{th}} letter in the move sequence and
+the ASCII values for the moves are:
+
+\begin{longtable}[]{@{}ll@{}}
+\toprule
+\endhead
+\textbf{L} & 76 \\
+\textbf{R} & 82 \\
+\textbf{U} & 85 \\
+\textbf{D} & 68 \\
+\bottomrule
+\end{longtable}
+
+For the sequence \textbf{LULUR} given above, the checksum would be
+19761398.
+
+Now, starting from configuration (\textbf{S}), find all shortest ways to
+reach configuration (\textbf{T}).
+
+\begin{longtable}[]{@{}m{1cm}m{4cm}m{1cm}m{4cm}@{}}
+\toprule
+\endhead
+(\textbf{S}) & \includegraphics{project/images/p244_start.gif} &
+,~(\textbf{T}) & \includegraphics{project/images/p244_target.gif} \\
+\bottomrule
+\end{longtable}
+
+What is the sum of all checksums for the paths having the minimal
+length?

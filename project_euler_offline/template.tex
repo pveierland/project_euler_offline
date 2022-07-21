@@ -1,0 +1,148 @@
+\documentclass[]{article}
+
+\usepackage{fontspec}
+\setmainfont{CMU Serif}
+\usepackage{unicode-math}
+\usepackage[a4paper, top=3cm, bottom=3cm, left=2.5cm, right=2.5cm]{geometry}
+
+\usepackage[export]{adjustbox}
+\usepackage{animate}
+\usepackage{array}
+\usepackage{attachfile2}
+\usepackage[english]{babel}
+\usepackage{booktabs}
+\usepackage{fancyhdr}
+\usepackage{graphicx}
+\usepackage{lastpage}
+\usepackage{longtable}
+\usepackage{ragged2e}
+\usepackage{soul}
+\usepackage{textcomp}
+\usepackage{tikz}
+\usepackage[explicit]{titlesec}
+\usepackage{xcolor}
+
+\definecolor{linkcolor}{HTML}{4a7aa4}
+
+\usepackage{hyperref}
+\hypersetup{
+  allcolors=linkcolor,
+  colorlinks=true,
+  pdfauthor={Project Euler Offline},
+  pdftitle={Project Euler Offline},
+  unicode,
+}
+
+\title{Project Euler Offline}
+\author{Project Euler Offline}
+\date{\today}
+
+% IMAGE CONFIG
+
+% Limit default figure sizes
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+
+% Set default figure placement
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+
+% MATHJAX SUPPORT
+
+\newcommand{\gt}{>}
+\newcommand{\lt}{<}
+
+% PAGE STYLING
+
+\fancypagestyle{fancyfirst}{%
+\fancyhead[C]{}
+\fancyfoot[C]{Page \thepage\ of \pageref*{LastPage}}
+}
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[C]{\textsc{Project Euler Offline}}
+\fancyfoot[C]{Page \thepage\ of \pageref*{LastPage}}
+
+% TITLE CONFIG
+
+\definecolor{titleblue}{HTML}{4a7aa4}
+
+\newbox\TitleUnderlineTestBox
+\newcommand*\TitleUnderline[1]
+  {%
+    \bgroup
+    \setbox\TitleUnderlineTestBox\hbox{\colorbox{titleblue}\strut}%
+    \setul{\dimexpr\dp\TitleUnderlineTestBox-.3ex\relax}{.3ex}%
+    \ul{#1}%
+    \egroup
+  }
+\newcommand*\StyledSectionBox[1]
+  {%
+    \colorbox{titleblue}
+      {%
+        \makebox[2.5em][c]
+          {%
+            \color{white}%
+            \strut
+            \csname the#1\endcsname
+          }%
+      }%
+    \TitleUnderline{\ \ \ }%
+  }
+\newcommand*\StyledTitleBox[1]
+  {%
+    \colorbox{titleblue}
+      {%
+        \makebox[5em][c]
+          {%
+            \color{white}%
+            \strut
+            #1
+          }%
+      }%
+  }
+\titleformat{\section}
+  {\Large\bfseries\sffamily\color{titleblue}}
+  {\StyledSectionBox{section}}
+  {0pt}
+  {\TitleUnderline{#1}}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt plus 2pt minus 1pt}
+
+% VARIOUS CONFIG
+
+\setlength{\emergencystretch}{3em}
+
+\setcounter{MaxMatrixCols}{20} % e.g. problem 341 requires more than default max 10
+
+\providecommand{\tightlist}{
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}
+}
+
+% https://tex.stackexchange.com/a/7045
+\newcommand*\circled[1]{\tikz[baseline=(char.base)]{
+  \node[shape=circle,draw,inner sep=2pt] (char) {#1};}}
+
+${preamble}
+
+\begin{document}
+
+\thispagestyle{fancyfirst}
+
+\begin{center}
+  {\scalebox{1.5}{\Huge\bfseries PROJECT EULER}}\\[0.4cm]
+  {\LARGE\bfseries UNOFFICIAL OFFLINE EDITION\footnote{\url{https://www.github.com/pveierland/project\_euler\_offline}}}\\[0.3cm]
+  Material from \href{http://projecteuler.net}{projecteuler.net} compiled by Per Magnus Veierland.\\[0.35cm]
+  \href{https://creativecommons.org/licenses/by-nc-sa/4.0/}{\includegraphics{../project_euler_offline/by-nc-sa.png}}
+\end{center}
+
+${content}
+
+\end{document}

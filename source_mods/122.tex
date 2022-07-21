@@ -1,0 +1,42 @@
+\section[Problem \#122: Efficient exponentiation]{Efficient exponentiation}
+\label{sec:problem_122}
+
+The most naive way of computing \emph{n}\textsuperscript{15} requires
+fourteen multiplications:
+
+\begin{center}
+\emph{n} × \emph{n} × ... × \emph{n} = \emph{n}\textsuperscript{15}
+\end{center}
+
+But using a "binary" method you can compute it in six multiplications:
+
+\begin{center}
+\emph{n} × \emph{n} = \emph{n}\textsuperscript{2}\\
+\emph{n}\textsuperscript{2} × \emph{n}\textsuperscript{2} =
+\emph{n}\textsuperscript{4}\\
+\emph{n}\textsuperscript{4} × \emph{n}\textsuperscript{4} =
+\emph{n}\textsuperscript{8}\\
+\emph{n}\textsuperscript{8} × \emph{n}\textsuperscript{4} =
+\emph{n}\textsuperscript{12}\\
+\emph{n}\textsuperscript{12} × \emph{n}\textsuperscript{2} =
+\emph{n}\textsuperscript{14}\\
+\emph{n}\textsuperscript{14} × \emph{n} = \emph{n}\textsuperscript{15}
+\end{center}
+
+However it is yet possible to compute it in only five multiplications:
+
+\begin{center}
+\emph{n} × \emph{n} = \emph{n}\textsuperscript{2}\\
+\emph{n}\textsuperscript{2} × \emph{n} = \emph{n}\textsuperscript{3}\\
+\emph{n}\textsuperscript{3} × \emph{n}\textsuperscript{3} =
+\emph{n}\textsuperscript{6}\\
+\emph{n}\textsuperscript{6} × \emph{n}\textsuperscript{6} =
+\emph{n}\textsuperscript{12}\\
+\emph{n}\textsuperscript{12} × \emph{n}\textsuperscript{3} =
+\emph{n}\textsuperscript{15}
+\end{center}
+
+We shall define m(\emph{k}) to be the minimum number of multiplications
+to compute \emph{n}\textsuperscript{\emph{k}}; for example m(15) = 5.
+
+For 1 ≤ \emph{k} ≤ 200, find {∑} m(\emph{k}).

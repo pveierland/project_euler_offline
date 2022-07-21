@@ -1,0 +1,17 @@
+{
+    "folders": [
+        {
+            "name": "project_euler_offline",
+            "path": "."
+        }
+    ],
+    "settings": {
+        "editor.codeActionsOnSave": {
+            "source.fixAll.eslint": true,
+            "source.organizeImports": true
+        },
+        "editor.formatOnSave": true,
+        "python.formatting.provider": "black",
+        "python.languageServer": "Pylance"
+    }
+}

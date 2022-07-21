@@ -1,0 +1,23 @@
+\section[Problem \#326: Modulo Summations]{Modulo Summations}
+\label{sec:problem_326}
+
+Let $a_n$ be a sequence recursively defined
+by:$\quad a_1=1,\quad\displaystyle a_n=\biggl(\sum_{k=1}^{n-1}k\cdot a_k\biggr)\bmod n$.
+
+So the first 10 elements of $a_n$ are:
+1,1,0,3,0,3,5,4,1,9.
+
+Let \texttt{f}(\texttt{N,M}) represent the number of pairs
+(\texttt{p,q}) such that:
+
+$$
+1\le p\le q\le N \quad\text{and}\quad\biggl(\sum_{i=p}^qa_i\biggr)\bmod M=0
+$$
+
+It can be seen that \texttt{f}(10,10)=4 with the pairs (3,3), (5,5),
+(7,9) and (9,10).
+
+You are also given that
+\texttt{f}(10\textsuperscript{4},10\textsuperscript{3})=97158.
+
+Find \texttt{f}(10\textsuperscript{12},10\textsuperscript{6}).

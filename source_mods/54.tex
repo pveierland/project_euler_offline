@@ -1,0 +1,110 @@
+\section[Problem \#54: Poker hands]{Poker hands}
+\label{sec:problem_54}
+
+In the card game poker, a hand consists of five cards and are ranked,
+from lowest to highest, in the following way:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{High Card}: Highest value card.
+\item
+  \textbf{One Pair}: Two cards of the same value.
+\item
+  \textbf{Two Pairs}: Two different pairs.
+\item
+  \textbf{Three of a Kind}: Three cards of the same value.
+\item
+  \textbf{Straight}: All cards are consecutive values.
+\item
+  \textbf{Flush}: All cards of the same suit.
+\item
+  \textbf{Full House}: Three of a kind and a pair.
+\item
+  \textbf{Four of a Kind}: Four cards of the same value.
+\item
+  \textbf{Straight Flush}: All cards are consecutive values of same
+  suit.
+\item
+  \textbf{Royal Flush}: Ten, Jack, Queen, King, Ace, in same suit.
+\end{itemize}
+
+The cards are valued in the order:\\
+2, 3, 4, 5, 6, 7, 8, 9, 10, Jack, Queen, King, Ace.
+
+If two players have the same ranked hands then the rank made up of the
+highest value wins; for example, a pair of eights beats a pair of fives
+(see example 1 below). But if two ranks tie, for example, both players
+have a pair of queens, then highest cards in each hand are compared (see
+example 4 below); if the highest cards tie then the next highest cards
+are compared, and so on.
+
+Consider the following five hands dealt to two players:
+
+\begin{longtable}[]{@{}lllllll@{}}
+\toprule
+\textbf{Hand} & ~ & \textbf{Player 1} & ~ & \textbf{Player 2} & ~ &
+\textbf{Winner} \\
+\endhead
+\midrule
+\textbf{1} & ~ & \begin{minipage}[t]{0.2\linewidth}\raggedright
+5H 5C 6S 7S KD\\
+
+{\small{}Pair of Fives}\strut
+\end{minipage} & ~ & \begin{minipage}[t]{0.2\linewidth}\raggedright
+2C 3S 8S 8D TD\\
+
+{\small{}Pair of Eights}\strut
+\end{minipage} & ~ & Player 2 \\
+\textbf{2} & ~ & \begin{minipage}[t]{0.2\linewidth}\raggedright
+5D 8C 9S JS AC\\
+
+{\small{}Highest card Ace}\strut
+\end{minipage} & ~ & \begin{minipage}[t]{0.2\linewidth}\raggedright
+2C 5C 7D 8S QH\\
+
+{\small{}Highest card Queen}\strut
+\end{minipage} & ~ & Player 1 \\
+\textbf{3} & ~ & \begin{minipage}[t]{0.2\linewidth}\raggedright
+2D 9C AS AH AC\\
+
+{\small{}Three Aces}\strut
+\end{minipage} & ~ & \begin{minipage}[t]{0.2\linewidth}\raggedright
+3D 6D 7D TD QD\\
+
+{\small{}Flush with Diamonds}\strut
+\end{minipage} & ~ & Player 2 \\
+\textbf{4} & ~ & \begin{minipage}[t]{0.2\linewidth}\raggedright
+4D 6S 9H QH QC\\
+
+{\small{}Pair of Queens\\
+Highest card Nine}\strut
+\end{minipage} & ~ & \begin{minipage}[t]{0.2\linewidth}\raggedright
+3D 6D 7H QD QS\\
+
+{\small{}Pair of Queens\\
+Highest card Seven}\strut
+\end{minipage} & ~ & Player 1 \\
+\textbf{5} & ~ & \begin{minipage}[t]{0.2\linewidth}\raggedright
+2H 2D 4C 4D 4S\\
+
+{\small{}Full House\\
+With Three Fours}\strut
+\end{minipage} & ~ & \begin{minipage}[t]{0.2\linewidth}\raggedright
+3C 3D 3S 9S 9D\\
+
+{\small{}Full House\\
+with Three Threes}\strut
+\end{minipage} & ~ & Player 1 \\
+\bottomrule
+\end{longtable}
+
+The file, \href{project/resources/p054_poker.txt}{poker.txt}, contains
+one-thousand random hands dealt to two players. Each line of the file
+contains ten cards (separated by a single space): the first five are
+Player 1's cards and the last five are Player 2's cards. You can assume
+that all hands are valid (no invalid characters or repeated cards), each
+player's hand is in no specific order, and in each hand there is a clear
+winner.
+
+How many hands does Player 1 win?

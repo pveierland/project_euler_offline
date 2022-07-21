@@ -1,0 +1,6 @@
+aiohttp
+aiojobs
+black
+pandoc
+pydash
+tqdm
