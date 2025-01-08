@@ -1,0 +1,114 @@
+#!/usr/bin/env python
+
+import argparse
+import re
+from pathlib import Path
+
+PYTHON_PACKAGE_ALIASES = {
+}
+
+
+def python_nix_requirements_read_packages(
+    python_nix_requirements_path,
+):
+    return re.findall(
+        "pythonPackages[.](\\S+)",
+        python_nix_requirements_path.read_text(),
+    )
+
+
+def python_pip_requirements_purge_packages(
+    python_pip_requirements_path,
+    packages,
+):
+    def build_package_regex_pattern(package):
+        package_name_escaped = f"({re.escape(package)})"
+
+        return "|".join([
+            package_name_escaped,
+            package_name_escaped.replace('_', '-'),
+            package_name_escaped.replace('-', '_'),
+        ])
+
+    python_pip_requirements_data = python_pip_requirements_path.read_text()
+
+    packages_regex_pattern = (
+        "(" + "|".join(
+            build_package_regex_pattern(package)
+            for package in packages
+        ) + ")"
+    )
+
+    purge_regex_patterns = [
+        f"^{packages_regex_pattern}\\W+.*?\n([ \t]+.*?\n)*",
+        f"^[\\w-]+\\[{packages_regex_pattern}\\]\\W+.*?\n([ \t]+.*?\n)*",
+        f"^    # via {packages_regex_pattern}$",
+        f"^    #   {packages_regex_pattern}$",
+    ]
+
+    for purge_regex_pattern in purge_regex_patterns:
+        python_pip_requirements_data, purge_count = re.subn(
+            purge_regex_pattern,
+            "",
+            python_pip_requirements_data,
+            flags=re.M,
+        )
+
+    print(f"{python_pip_requirements_path}: {purge_count} entries purged")
+
+    python_pip_requirements_path.with_suffix(".pruned.txt").write_text(
+        python_pip_requirements_data
+    )
+
+
+def main():
+    parser = argparse.ArgumentParser(
+        description="Python Nix / Pip Requirements Pruner"
+    )
+    parser.add_argument(
+        "--paths",
+        type=str,
+        default=str(Path(__file__).resolve().parent),
+    )
+
+    args = parser.parse_args()
+
+    paths = [
+        Path(path_str) for path_str in args.paths.split(",") if Path(path_str).exists()
+    ]
+
+    python_purge_packages = set()
+
+    for path in paths:
+        python_nix_requirements_path = path / "python-requirements.nix"
+
+        if python_nix_requirements_path.exists():
+            python_purge_packages.update(
+                set(python_nix_requirements_read_packages(python_nix_requirements_path))
+            )
+
+    python_purge_packages.update(
+        {
+            python_purge_package_alias
+            for python_purge_package in python_purge_packages
+            if (
+                python_purge_package_aliases := PYTHON_PACKAGE_ALIASES.get(
+                    python_purge_package
+                )
+            )
+            for python_purge_package_alias in python_purge_package_aliases
+        }
+    )
+
+    for path in paths:
+        python_pip_requirements_path = path / "requirements.txt"
+
+        if python_pip_requirements_path.exists():
+            python_pip_requirements_purge_packages(
+                python_pip_requirements_path,
+                python_purge_packages,
+            )
+
+
+if __name__ == "__main__":
+    main()

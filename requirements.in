@@ -1,0 +1,6 @@
+aiohttp
+aiojobs
+pandoc==2.4
+pydash
+tqdm
+
