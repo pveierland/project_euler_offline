@@ -26,6 +26,12 @@ def escape_latex(text):
     )
 
 
+def html_title_to_latex(text):
+    text = re.sub(r"<sup>(.*?)</sup>", r"\\textsuperscript{\1}", text)
+    text = re.sub(r"<sub>(.*?)</sub>", r"\\textsubscript{\1}", text)
+    return escape_latex(text)
+
+
 LATEX_BLOCK_STYLES = {
     "center": {
         "pre": r"\begin{center}",
@@ -158,6 +164,10 @@ class DocumentBuilder:
         return output_latex_preamble
 
     def _transform_html_tag_class_info(self, soup, tag):
+        for img_tag in tag.find_all("img"):
+            img_tag.attrs.pop("width", None)
+            img_tag.attrs.pop("height", None)
+
         for tooltip_tag in tag.find_all(class_="tooltip"):
             tooltiptext_tag = tooltip_tag.find(class_="tooltiptext")
             if tooltiptext_tag:
@@ -252,9 +262,17 @@ class DocumentBuilder:
             document_latex,
         )
 
-        # Set solo image centering (only for images on their own paragraph, not inside lists):
+        # Convert align* environments with \hline to array (where \hline is supported):
         document_latex = re.sub(
-            r"(?P<space_pre>\n\n)(?P<bounded>\\pandocbounded\{)?\\includegraphics(?P<options>\[[^\]]*\])?{(?P<name>.*?)}(?(bounded)\})(\\\\)?(?P<space_post>\n\n)",
+            r"\\begin\{align\*\}(.*?\\hline.*?)\\end\{align\*\}",
+            r"\\[\\begin{array}{r}\1\\end{array}\\]",
+            document_latex,
+            flags=re.DOTALL,
+        )
+
+        # Set solo image centering (only for images on their own line):
+        document_latex = re.sub(
+            r"(?P<space_pre>\n+)(?P<bounded>\\pandocbounded\{)?\\includegraphics(?P<options>\[[^\]]*\])?{(?P<name>.*?)}(?(bounded)\})(\\\\)?(?P<space_post>\n+)",
             r"\g<space_pre>\\begin{center}\\includegraphics\g<options>{\g<name>}\\end{center}\g<space_post>",
             document_latex,
         )
@@ -489,7 +507,7 @@ class DocumentBuilder:
             r"^#(?P<problem_id>\d+)\s+(?P<problem_name>.*?) - Project Euler$",
             problem_soup.title.text,
         )
-        problem_title = escape_latex(title_match.group('problem_name'))
+        problem_title = html_title_to_latex(title_match.group('problem_name'))
         problem_title_bookmark = re.sub(
             r"\$([^$]+)\$",
             r"\\texorpdfstring{$\1$}{\1}",

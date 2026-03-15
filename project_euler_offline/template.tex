@@ -133,7 +133,15 @@
 
 % VARIOUS CONFIG
 
+\tolerance=1000
 \setlength{\emergencystretch}{3em}
+
+% Allow line breaks at commas in inline math
+\AtBeginDocument{%
+  \mathchardef\origmathcomma=\mathcode`,%
+  \begingroup\lccode`~=`,%
+  \lowercase{\endgroup\gdef~{\origmathcomma\allowbreak}}%
+  \mathcode`,="8000 }
 
 \setcounter{MaxMatrixCols}{20} % e.g. problem 341 requires more than default max 10
 
