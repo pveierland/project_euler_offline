@@ -29,7 +29,7 @@
         ];
       in
       {
-        devShell = (
+        devShells.default = (
           pkgs.mkShell
             {
               nativeBuildInputs = (
