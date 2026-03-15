@@ -50,7 +50,6 @@
                 adjustbox
                 animate
                 attachfile2
-                cm-unicode
                 collectbox
                 fancyhdr
                 lastpage
