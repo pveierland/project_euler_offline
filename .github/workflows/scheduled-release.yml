@@ -1,0 +1,40 @@
+name: Scheduled Release
+
+on:
+  schedule:
+    - cron: "0 0 1 * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: DeterminateSystems/nix-installer-action@main
+      - uses: DeterminateSystems/magic-nix-cache-action@main
+
+      - name: Fetch problem data
+        run: nix develop --command python -m project_euler_offline fetch
+
+      - name: Build compact PDF
+        run: nix develop --command python -m project_euler_offline render --pdf
+
+      - name: Build spaced PDF
+        run: nix develop --command python -m project_euler_offline render --pdf --spaced
+
+      - name: Create release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          DATE=$(date -u +%Y-%m-%d)
+          cp out/project_euler_offline.pdf "project-euler-offline-${DATE}.pdf"
+          cp out/project_euler_offline_spaced.pdf "project-euler-offline-${DATE}-spaced.pdf"
+          gh release create "${DATE}" \
+            "project-euler-offline-${DATE}.pdf" \
+            "project-euler-offline-${DATE}-spaced.pdf" \
+            --title "${DATE}" \
+            --notes "Automated build of Project Euler Offline."
