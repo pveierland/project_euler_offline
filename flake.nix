@@ -38,7 +38,6 @@
       {
         devShells.default = pkgs.mkShell {
           nativeBuildInputs = with pkgs; [
-            okular
             pandoc
             pkgs-unstable.ruff
             pkgs-unstable.uv
