@@ -17,6 +17,12 @@ jobs:
       - uses: DeterminateSystems/nix-installer-action@main
       - uses: DeterminateSystems/magic-nix-cache-action@main
 
+      - name: Restore HTTP cache
+        uses: actions/cache@v4
+        with:
+          path: out/http_cache.sqlite3
+          key: http-cache
+
       - name: Fetch problem data
         run: nix develop --command python -m project_euler_offline fetch
 
