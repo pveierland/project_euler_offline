@@ -1,10 +1,13 @@
 import re
+import warnings
 from collections import defaultdict
 from pathlib import Path
 from string import Template
 
-import pandoc
-import pandoc.types
+with warnings.catch_warnings():
+    warnings.simplefilter("ignore", UserWarning)
+    import pandoc
+    import pandoc.types
 from bs4 import BeautifulSoup
 
 LATEX_BLOCK_STYLES = {
@@ -132,7 +135,7 @@ class DocumentBuilder:
 
         for color_value, color_name in self._color_mappings.items():
             output_latex_preamble += (
-                f"\definecolor{{{color_name}}}{{HTML}}{{{color_value}}}\n"
+                f"\\definecolor{{{color_name}}}{{HTML}}{{{color_value}}}\n"
             )
 
         return output_latex_preamble
@@ -195,13 +198,13 @@ class DocumentBuilder:
         # Prevent issue with align environement wrapped in math env:
         document_latex = re.sub(
             r"((\$\$?)|(\\\[))\s*(?P<begin_env>\\begin{((align(ed)?)|equation)\*?})",
-            "\g<begin_env>",
+            r"\g<begin_env>",
             document_latex,
             flags=re.DOTALL | re.MULTILINE,
         )
         document_latex = re.sub(
             r"(?P<end_env>\\end{((align(ed)?)|equation)\*?})\s*((\$\$?)|(\\\]))",
-            "\g<end_env>",
+            r"\g<end_env>",
             document_latex,
             flags=re.DOTALL | re.MULTILINE,
         )
@@ -209,7 +212,7 @@ class DocumentBuilder:
         # Ensure non-numbered align and equation envs:
         document_latex = re.sub(
             r"\\(?P<begin_end>(begin|end)){(?P<env_type>(align|equation))}",
-            "\\\\\g<begin_end>{\g<env_type>*}",
+            r"\\\g<begin_end>{\g<env_type>*}",
             document_latex,
         )
 
@@ -299,28 +302,28 @@ class DocumentBuilder:
 
         style_lower = style.lower()
 
-        if color := re.match("color:\s*#?(?P<color_value>[^;\s]+)", style_lower):
+        if color := re.match(r"color:\s*#?(?P<color_value>[^;\s]+)", style_lower):
             classes.add(f"__COLOR__{color.group('color_value')}")
 
         if re.search("font-family:[^;]*(courier new|monospace)", style_lower):
             classes.add("monospace")
 
-        if re.search("font-size:\s*larger", style_lower):
+        if re.search(r"font-size:\s*larger", style_lower):
             classes.add("larger")
 
-        if re.search("font-size:\s*smaller", style_lower):
+        if re.search(r"font-size:\s*smaller", style_lower):
             classes.add("smaller")
 
-        if re.search("font-style:\s*italic", style_lower):
+        if re.search(r"font-style:\s*italic", style_lower):
             classes.add("italic")
 
-        if re.search("font-weight:\s*bold", style_lower):
+        if re.search(r"font-weight:\s*bold", style_lower):
             classes.add("strong")
 
-        if re.search("text-align:\s*center", style_lower):
+        if re.search(r"text-align:\s*center", style_lower):
             classes.add("center")
 
-        if re.search("text-decoration:\s*underline", style_lower):
+        if re.search(r"text-decoration:\s*underline", style_lower):
             classes.add("underline")
 
         return classes
@@ -384,7 +387,7 @@ class DocumentBuilder:
         about_content_tag = about_soup.find(id="about_page")
 
         about_title = re.sub(
-            "About...\s*(?P<about_title>.*)",
+            r"About...\s*(?P<about_title>.*)",
             r"\g<about_title>",
             extract_page_title(about_content_tag).text,
         )
@@ -442,7 +445,7 @@ class DocumentBuilder:
         problem_content_html = str(problem_content_soup_tag)
 
         title_match = re.match(
-            "^#(?P<problem_id>\d+)\s+(?P<problem_name>.*?) - Project Euler$",
+            r"^#(?P<problem_id>\d+)\s+(?P<problem_name>.*?) - Project Euler$",
             problem_soup.title.text,
         )
         problem_title = f"{title_match.group('problem_name')}"
@@ -450,7 +453,7 @@ class DocumentBuilder:
         # TODO: Problem ID in section numbering should be explicit
         # TODO: Problem title should link to problem URL
         problem_content_latex = (
-            f"\\section[Problem \#{problem_id}: {problem_title}]{{{problem_title}}}\n"
+            f"\\section[Problem \\#{problem_id}: {problem_title}]{{{problem_title}}}\n"
             + f"\\label{{sec:problem_{problem_id}}}\n\n"
             + self._transform_html_to_latex(problem_content_html)
         )
