@@ -142,6 +142,7 @@ class DocumentBuilder:
         self._url_paths_embedded = set()
         self._url_paths_resources = set()
 
+        self._tooltip_footnotes = {}
         self._output_latex_content = ""
         self._output_html_debug = ""
         self._output_has_appendix = False
@@ -157,6 +158,16 @@ class DocumentBuilder:
         return output_latex_preamble
 
     def _transform_html_tag_class_info(self, soup, tag):
+        for tooltip_tag in tag.find_all(class_="tooltip"):
+            tooltiptext_tag = tooltip_tag.find(class_="tooltiptext")
+            if tooltiptext_tag:
+                footnote_text = tooltiptext_tag.get_text()
+                tooltiptext_tag.decompose()
+                marker_index = len(self._tooltip_footnotes)
+                marker = f"TOOLTIP{marker_index}FOOTNOTE"
+                self._tooltip_footnotes[marker] = footnote_text
+                tooltip_tag.insert_after(marker)
+
         for block_tag_name in ["p", "blockquote"]:
             block_tags = [
                 block_tag
@@ -214,6 +225,11 @@ class DocumentBuilder:
             substitution = substitution.replace("&lt;", r"<")
             substitution = substitution.replace("&gt;", r">")
             document_latex = document_latex.replace(marker, substitution)
+
+        for marker, footnote_text in self._tooltip_footnotes.items():
+            document_latex = document_latex.replace(
+                marker, rf"\footnote{{{footnote_text}}}"
+            )
 
         # Prevent issue with align environement wrapped in math env:
         document_latex = re.sub(
