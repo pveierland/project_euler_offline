@@ -194,7 +194,7 @@ class ProjectEulerOfflineApp:
             subprocess.run(
                 [
                     "latexmk",
-                    "-pdf",
+                    "-xelatex",
                     str(output_latex_path.relative_to(self._output_path)),
                 ],
                 cwd=str(self._output_path),
