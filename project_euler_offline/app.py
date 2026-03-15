@@ -27,8 +27,9 @@ class ProjectEulerOfflineApp:
 
     def _write_http_resource(self, url_path, store_in_base=False, **kwargs):
         data = self._retrieve_http_data(url_path, **kwargs)
+        clean_path = url_path.split("?")[0]
         path = self._output_path / (
-            Path(url_path).name if store_in_base else Path(url_path)
+            Path(clean_path).name if store_in_base else Path(clean_path)
         )
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_bytes(data)
@@ -153,10 +154,10 @@ class ProjectEulerOfflineApp:
 
                 subprocess.run(
                     [
-                        "convert",
+                        "magick",
+                        str(resource_file_path),
                         "-coalesce",
                         "-despeckle",
-                        str(resource_file_path),
                         str(resource_file_path.with_suffix(".png")),
                     ]
                 )

@@ -55,10 +55,13 @@
                 fancyhdr
                 lastpage
                 latexmk
+                media9
                 ragged2e
                 soul
                 titlesec
+                ocgx2
                 unicode-math
+                zref
                 ;
             })
             uv

@@ -33,6 +33,18 @@
   unicode,
 }
 
+\pdfstringdefDisableCommands{%
+  \def\ensuremath#1{#1}%
+  \def\mathcal#1{#1}%
+  \def\symcal#1{#1}%
+  \def\times{x}%
+}
+
+\let\origtextasciicircum\textasciicircum
+\renewcommand{\textasciicircum}{\ifmmode\string^\else\origtextasciicircum\fi}
+\let\origtextasciitilde\textasciitilde
+\renewcommand{\textasciitilde}{\ifmmode\sim\else\origtextasciitilde\fi}
+
 \title{Project Euler Offline}
 \author{Project Euler Offline}
 \date{\today}
@@ -54,8 +66,11 @@
 
 % MATHJAX SUPPORT
 
+\newcommand{\Bbb}{\mathbb}
 \newcommand{\gt}{>}
 \newcommand{\lt}{<}
+\newcommand{\enclose}[2]{\circled{$$#2$$}}
+\newcommand{\pu}[1]{\ensuremath{\mathrm{#1}}}
 
 % PAGE STYLING
 
@@ -126,6 +141,8 @@
   \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}
 }
 
+\providecommand{\pandocbounded}[1]{#1}
+
 % https://tex.stackexchange.com/a/7045
 \newcommand*\circled[1]{\tikz[baseline=(char.base)]{
   \node[shape=circle,draw,inner sep=2pt] (char) {#1};}}
@@ -139,7 +156,7 @@ ${preamble}
 \begin{center}
   {\scalebox{1.5}{\Huge\bfseries PROJECT EULER}}\\[0.4cm]
   {\LARGE\bfseries UNOFFICIAL OFFLINE EDITION\footnote{\url{https://www.github.com/pveierland/project\_euler\_offline}}}\\[0.3cm]
-  Material from \href{http://projecteuler.net}{projecteuler.net} compiled by Per Magnus Veierland.\\[0.35cm]
+  Material compiled from \href{http://projecteuler.net}{projecteuler.net}.\\[0.35cm]
   \href{https://creativecommons.org/licenses/by-nc-sa/4.0/}{\includegraphics{../project_euler_offline/by-nc-sa.png}}
 \end{center}
 

@@ -10,6 +10,22 @@ with warnings.catch_warnings():
     import pandoc.types
 from bs4 import BeautifulSoup
 
+LATEX_SPECIAL_CHARS = {
+    "&": r"\&",
+    "%": r"\%",
+    "#": r"\#",
+    "_": r"\_",
+}
+
+
+def escape_latex(text):
+    return re.sub(
+        r"[&%#_]",
+        lambda m: LATEX_SPECIAL_CHARS[m.group()],
+        text,
+    )
+
+
 LATEX_BLOCK_STYLES = {
     "center": {
         "pre": r"\begin{center}",
@@ -176,8 +192,8 @@ class DocumentBuilder:
             latex_substitutions[marker] = match.group(0)
             return marker
 
-        content_html = re.sub(r"\$\$[^$]+?\$\$", replace_with_marker, content_html)
-        content_html = re.sub(r"\$[^$]+?\$", replace_with_marker, content_html)
+        content_html = re.sub(r"\$\$(?:[^$\\]|\\.)+?\$\$", replace_with_marker, content_html, flags=re.DOTALL)
+        content_html = re.sub(r"\$(?:[^$\\]|\\.)+?\$", replace_with_marker, content_html, flags=re.DOTALL)
         content_html = re.sub(
             r"\\\[.*?\\\]",
             replace_with_marker,
@@ -189,7 +205,11 @@ class DocumentBuilder:
         self._transform_pandoc_document(document_pandoc)
         document_latex = str(pandoc.write(document_pandoc, format="latex").strip())
 
+        # Unescape dollar signs escaped by Pandoc (before restoring math markers):
+        document_latex = document_latex.replace(r"\$", "$")
+
         for marker, substitution in latex_substitutions.items():
+            substitution = re.sub(r"<[^>]+>", "", substitution)
             substitution = substitution.replace("&amp;", r"&")
             substitution = substitution.replace("&lt;", r"<")
             substitution = substitution.replace("&gt;", r">")
@@ -197,31 +217,30 @@ class DocumentBuilder:
 
         # Prevent issue with align environement wrapped in math env:
         document_latex = re.sub(
-            r"((\$\$?)|(\\\[))\s*(?P<begin_env>\\begin{((align(ed)?)|equation)\*?})",
+            r"((\$\$?)|(\\\[))\s*(?P<begin_env>\\begin{((align(at|ed)?)|equation|gather)\*?})",
             r"\g<begin_env>",
             document_latex,
             flags=re.DOTALL | re.MULTILINE,
         )
         document_latex = re.sub(
-            r"(?P<end_env>\\end{((align(ed)?)|equation)\*?})\s*((\$\$?)|(\\\]))",
+            r"(?P<end_env>\\end{((align(at|ed)?)|equation|gather)\*?})\s*((\$\$?)|(\\\]))",
             r"\g<end_env>",
             document_latex,
             flags=re.DOTALL | re.MULTILINE,
         )
 
-        # Ensure non-numbered align and equation envs:
+        # Ensure non-numbered align, alignat, equation, and gather envs:
         document_latex = re.sub(
-            r"\\(?P<begin_end>(begin|end)){(?P<env_type>(align|equation))}",
+            r"\\(?P<begin_end>(begin|end)){(?P<env_type>(align(at)?|equation|gather))}",
             r"\\\g<begin_end>{\g<env_type>*}",
             document_latex,
         )
 
-        # Set solo image centering:
+        # Set solo image centering (only for images on their own paragraph, not inside lists):
         document_latex = re.sub(
-            r"(?P<space_pre>\s\s+)\\includegraphics(?P<options>\[[^\]]*\])?{(?P<name>.*?)}(\\\\)?(?P<space_post>\s\s+)",
+            r"(?P<space_pre>\n\n)(?P<bounded>\\pandocbounded\{)?\\includegraphics(?P<options>\[[^\]]*\])?{(?P<name>.*?)}(?(bounded)\})(\\\\)?(?P<space_post>\n\n)",
             r"\g<space_pre>\\begin{center}\\includegraphics\g<options>{\g<name>}\\end{center}\g<space_post>",
             document_latex,
-            flags=re.DOTALL | re.MULTILINE,
         )
 
         return document_latex
@@ -419,7 +438,13 @@ class DocumentBuilder:
                     options = r"controls=all,keepaspectratio,loop,width=\linewidth"
 
                     if existing_options := match.group("options"):
-                        options += "," + existing_options
+                        # Filter out options not supported by animategraphics:
+                        filtered = [
+                            opt for opt in existing_options.split(",")
+                            if not opt.strip().startswith("alt=")
+                        ]
+                        if filtered:
+                            options += "," + ",".join(filtered)
 
                     return rf"\animategraphics[{options}]{{{frame_rate}}}{{{file_path_base_name}}}{{0}}{{{animated_resource['frame_count'] - 1}}}"
                 else:
@@ -448,12 +473,17 @@ class DocumentBuilder:
             r"^#(?P<problem_id>\d+)\s+(?P<problem_name>.*?) - Project Euler$",
             problem_soup.title.text,
         )
-        problem_title = f"{title_match.group('problem_name')}"
+        problem_title = escape_latex(title_match.group('problem_name'))
+        problem_title_bookmark = re.sub(
+            r"\$([^$]+)\$",
+            r"\\texorpdfstring{$\1$}{\1}",
+            problem_title,
+        )
 
         # TODO: Problem ID in section numbering should be explicit
         # TODO: Problem title should link to problem URL
         problem_content_latex = (
-            f"\\section[Problem \\#{problem_id}: {problem_title}]{{{problem_title}}}\n"
+            f"\\section[Problem \\#{problem_id}: {problem_title_bookmark}]{{{problem_title}}}\n"
             + f"\\label{{sec:problem_{problem_id}}}\n\n"
             + self._transform_html_to_latex(problem_content_html)
         )
@@ -503,6 +533,13 @@ class DocumentBuilder:
         output_latex = template.substitute(
             preamble=self._build_latex_preamble(),
             content=output_latex_content,
+        )
+
+        # Strip query strings from includegraphics paths:
+        output_latex = re.sub(
+            r"(\\includegraphics(\[[^\]]*\])?{[^}?]+)\?[^}]*(})",
+            r"\1\3",
+            output_latex,
         )
 
         for character, substitution in LATEX_CHARACTER_SUBSTITUTIONS.items():
