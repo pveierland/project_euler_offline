@@ -3,24 +3,26 @@
 
   inputs = {
     flake-utils.url = "github:numtide/flake-utils";
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-24.11";
-    nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.11";
   };
 
-  outputs = inputs@{ self, flake-utils, nixpkgs, nixpkgs-unstable, ... }:
+  outputs = inputs@{ self, flake-utils, nixpkgs, ... }:
     flake-utils.lib.eachDefaultSystem (system:
       let
         pkgs = import nixpkgs { inherit system; };
-        pkgs-unstable = import nixpkgs-unstable { inherit system; };
 
         pandoc-python = pkgs.python312Packages.buildPythonPackage rec {
           pname = "pandoc";
           version = "2.4";
+          pyproject = true;
           src = pkgs.python312Packages.fetchPypi {
             inherit pname version;
             hash = "sha256-7NH4y7f0GAxrXbShenwadN9RmZX18Ybvgc5yqcvQ3Zo=";
           };
-          propagatedBuildInputs = with pkgs.python312Packages; [
+          build-system = with pkgs.python312Packages; [
+            setuptools
+          ];
+          dependencies = with pkgs.python312Packages; [
             plumbum
             ply
           ];
@@ -38,11 +40,28 @@
       {
         devShells.default = pkgs.mkShell {
           nativeBuildInputs = with pkgs; [
+            imagemagick
             pandoc
-            pkgs-unstable.ruff
-            pkgs-unstable.uv
             pythonEnvironment
-            texlive.combined.scheme-full
+            ruff
+            (texlive.combine {
+              inherit (texlive)
+                scheme-small
+                adjustbox
+                animate
+                attachfile2
+                cm-unicode
+                collectbox
+                fancyhdr
+                lastpage
+                latexmk
+                ragged2e
+                soul
+                titlesec
+                unicode-math
+                ;
+            })
+            uv
           ];
         };
       }
