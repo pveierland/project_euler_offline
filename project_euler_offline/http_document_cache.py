@@ -1,11 +1,15 @@
 #!/bin/env python
 
+import asyncio
 import datetime
 import http
 import json
+import logging
 import sqlite3
 
 import aiohttp
+
+logger = logging.getLogger(__name__)
 
 
 class DataRetrievalError(BaseException):
@@ -68,43 +72,57 @@ class HttpDocumentCache:
                     return cache_entry["response_data"]
 
         if not cache_only:
-            async with aiohttp.ClientSession() as session:
-                request_timestamp = datetime.datetime.now()
+            max_retries = 5
+            base_delay = 5
 
-                request_headers = {}
+            for attempt in range(max_retries + 1):
+                async with aiohttp.ClientSession() as session:
+                    request_timestamp = datetime.datetime.now()
 
-                async with session.get(
-                    request_url, headers=request_headers
-                ) as response:
-                    if response.status == http.HTTPStatus.OK:
-                        response_headers = {k: v for k, v in response.headers.items()}
-                        response_data = await response.read()
+                    request_headers = {}
 
-                        if not response_data or len(response_data) == 0:
-                            raise MissingDataError(
-                                f"{request_url}: Missing response payload"
-                            )
+                    async with session.get(
+                        request_url, headers=request_headers
+                    ) as response:
+                        if response.status == http.HTTPStatus.OK:
+                            response_headers = {
+                                k: v for k, v in response.headers.items()
+                            }
+                            response_data = await response.read()
 
-                        if not cache_disable:
-                            with self._database_connection:
-                                self._database_connection.execute(
-                                    "insert into http_cache(request_timestamp, request_url, request_headers, response_headers, response_data) "
-                                    + "values (:request_timestamp, :request_url, :request_headers, :response_headers, :response_data)",
-                                    {
-                                        "request_timestamp": request_timestamp,
-                                        "request_url": request_url,
-                                        "request_headers": request_headers,
-                                        "response_headers": response_headers,
-                                        "response_data": response_data,
-                                    },
+                            if not response_data or len(response_data) == 0:
+                                raise MissingDataError(
+                                    f"{request_url}: Missing response payload"
                                 )
 
-                        return response_data
-                    elif response.status == http.HTTPStatus.FOUND:
-                        raise MissingDataError(
-                            f"{request_url}: HTTP 302 (Object moved temporarily)"
-                        )
-                    else:
-                        raise DataRetrievalError(
-                            f"{request_url}: HTTP {response.status}"
-                        )
+                            if not cache_disable:
+                                with self._database_connection:
+                                    self._database_connection.execute(
+                                        "insert into http_cache(request_timestamp, request_url, request_headers, response_headers, response_data) "
+                                        + "values (:request_timestamp, :request_url, :request_headers, :response_headers, :response_data)",
+                                        {
+                                            "request_timestamp": request_timestamp,
+                                            "request_url": request_url,
+                                            "request_headers": request_headers,
+                                            "response_headers": response_headers,
+                                            "response_data": response_data,
+                                        },
+                                    )
+
+                            return response_data
+                        elif response.status == http.HTTPStatus.FOUND:
+                            raise MissingDataError(
+                                f"{request_url}: HTTP 302 (Object moved temporarily)"
+                            )
+                        elif attempt < max_retries:
+                            delay = base_delay * (2**attempt)
+                            logger.warning(
+                                f"{request_url}: HTTP {response.status}, "
+                                f"retrying in {delay}s "
+                                f"(attempt {attempt + 1}/{max_retries})"
+                            )
+                            await asyncio.sleep(delay)
+                        else:
+                            raise DataRetrievalError(
+                                f"{request_url}: HTTP {response.status}"
+                            )
