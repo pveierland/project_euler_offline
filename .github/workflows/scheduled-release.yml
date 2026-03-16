@@ -37,10 +37,10 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           DATE=$(date -u +%Y-%m-%d)
-          cp out/project_euler_offline.pdf "project-euler-offline-${DATE}.pdf"
-          cp out/project_euler_offline_spaced.pdf "project-euler-offline-${DATE}-spaced.pdf"
+          cp out/project_euler_offline.pdf project_euler_offline.pdf
+          cp out/project_euler_offline_spaced.pdf project_euler_offline_spaced.pdf
           gh release create "${DATE}" \
-            "project-euler-offline-${DATE}.pdf" \
-            "project-euler-offline-${DATE}-spaced.pdf" \
+            project_euler_offline.pdf \
+            project_euler_offline_spaced.pdf \
             --title "${DATE}" \
             --notes "Automated build of Project Euler Offline."
