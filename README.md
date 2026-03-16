@@ -10,7 +10,17 @@ Project Euler Offline is an unofficial compilation of the [Project Euler](https:
 
 Project Euler Offline is available in a compact and a spaced version. The spaced version renders problems on individual pages to leave room for note taking.
 
-[![Download](https://img.shields.io/github/v/release/pveierland/project_euler_offline?label=Download%20Latest&style=for-the-badge)](https://github.com/pveierland/project_euler_offline/releases/latest)
+### Compact
+
+[![Download Compact](https://img.shields.io/badge/Download-Compact-blue?style=for-the-badge)](https://github.com/pveierland/project_euler_offline/releases/latest/download/project_euler_offline.pdf)
+
+[![Compact version preview](docs/images/preview_compact.webp)](https://github.com/pveierland/project_euler_offline/releases/latest/download/project_euler_offline.pdf)
+
+### Spaced
+
+[![Download Spaced](https://img.shields.io/badge/Download-Spaced-blue?style=for-the-badge)](https://github.com/pveierland/project_euler_offline/releases/latest/download/project_euler_offline_spaced.pdf)
+
+[![Spaced version preview](docs/images/preview_spaced.webp)](https://github.com/pveierland/project_euler_offline/releases/latest/download/project_euler_offline_spaced.pdf)
 
 ## Usage
 
@@ -33,10 +43,7 @@ python -m project_euler_offline render --pdf --spaced
 
 NB: Note that files are also downloaded during rendering.
 
-## Ideas
-
-- Consider separate screen and print versions to better utilize screen real estate.
-
 ## License
 
-The original content of this repository is licensed under the [Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0) license](https://creativecommons.org/licenses/by-nc-sa/4.0/). Content within the `source_mods` folder are direct copies from Project Euler with necessary modifications for the compilation.
+- The original content of this repository is licensed under the [Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0) license](https://creativecommons.org/licenses/by-nc-sa/4.0/).
+- Content within the `source_mods` folder are direct copies from Project Euler with necessary modifications for the compilation.

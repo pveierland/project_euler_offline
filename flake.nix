@@ -40,6 +40,7 @@
       {
         devShells.default = pkgs.mkShell {
           nativeBuildInputs = with pkgs; [
+            ghostscript
             imagemagick
             pandoc
             pythonEnvironment
