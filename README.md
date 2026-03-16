@@ -10,10 +10,7 @@ Project Euler Offline is an unofficial compilation of the [Project Euler](https:
 
 Project Euler Offline is available in a compact and a spaced version. The spaced version renders problems on individual pages to leave room for note taking.
 
-- [Download compact version](https://github.com/pveierland/project_euler_offline/releases/latest/download/project_euler_offline.pdf) (Multiple problems per page)
-- [Download spaced version](https://github.com/pveierland/project_euler_offline/releases/latest/download/project_euler_offline_spaced.pdf) (Problems on individual pages)
-
-NB: Download size is ~14 MB.
+[![Download](https://img.shields.io/github/v/release/pveierland/project_euler_offline?label=Download%20Latest&style=for-the-badge)](https://github.com/pveierland/project_euler_offline/releases/latest)
 
 ## Usage
 
