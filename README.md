@@ -10,17 +10,17 @@ Project Euler Offline is an unofficial compilation of the [Project Euler](https:
 
 Project Euler Offline is available in a compact and a spaced version. The spaced version renders problems on individual pages to leave room for note taking.
 
-### Compact
-
-[![Download Compact](https://img.shields.io/badge/Download-Compact-blue?style=for-the-badge)](https://github.com/pveierland/project_euler_offline/releases/latest/download/project_euler_offline.pdf)
+### Compact version
 
 [![Compact version preview](docs/images/preview_compact.webp)](https://github.com/pveierland/project_euler_offline/releases/latest/download/project_euler_offline.pdf)
 
-### Spaced
+[![Download](https://img.shields.io/github/v/release/pveierland/project_euler_offline?label=Download%20Compact%20Version&style=for-the-badge)](https://github.com/pveierland/project_euler_offline/releases/latest/download/project_euler_offline.pdf)
 
-[![Download Spaced](https://img.shields.io/badge/Download-Spaced-blue?style=for-the-badge)](https://github.com/pveierland/project_euler_offline/releases/latest/download/project_euler_offline_spaced.pdf)
+### Spaced version
 
 [![Spaced version preview](docs/images/preview_spaced.webp)](https://github.com/pveierland/project_euler_offline/releases/latest/download/project_euler_offline_spaced.pdf)
+
+[![Download](https://img.shields.io/github/v/release/pveierland/project_euler_offline?label=Download%20Spaced%20Version&style=for-the-badge)](https://github.com/pveierland/project_euler_offline/releases/latest/download/project_euler_offline_spaced.pdf)
 
 ## Usage
 
