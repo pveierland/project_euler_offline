@@ -13,6 +13,7 @@
 
         fontsConf = pkgs.makeFontsConf {
           fontDirectories = [
+            pkgs.lmodern
             pkgs.noto-fonts-cjk-sans-static
             pkgs.noto-fonts-monochrome-emoji
           ];
@@ -49,6 +50,7 @@
           nativeBuildInputs = with pkgs; [
             ghostscript
             imagemagick
+            lmodern
             noto-fonts-cjk-sans-static
             noto-fonts-monochrome-emoji
             pandoc
