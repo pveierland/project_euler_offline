@@ -14,8 +14,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: DeterminateSystems/nix-installer-action@main
-      - uses: DeterminateSystems/magic-nix-cache-action@main
+      - uses: cachix/install-nix-action@v31
+        with:
+          extra_nix_config: |
+            experimental-features = nix-command flakes
 
       - name: Restore HTTP cache
         uses: actions/cache@v4
