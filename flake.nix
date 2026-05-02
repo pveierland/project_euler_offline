@@ -11,6 +11,13 @@
       let
         pkgs = import nixpkgs { inherit system; };
 
+        fontsConf = pkgs.makeFontsConf {
+          fontDirectories = [
+            pkgs.noto-fonts-cjk-sans-static
+            pkgs.noto-fonts-monochrome-emoji
+          ];
+        };
+
         pandoc-python = pkgs.python312Packages.buildPythonPackage rec {
           pname = "pandoc";
           version = "2.4";
@@ -42,6 +49,8 @@
           nativeBuildInputs = with pkgs; [
             ghostscript
             imagemagick
+            noto-fonts-cjk-sans-static
+            noto-fonts-monochrome-emoji
             pandoc
             pythonEnvironment
             ruff
@@ -66,6 +75,8 @@
             })
             uv
           ];
+
+          FONTCONFIG_FILE = fontsConf;
         };
       }
     );

@@ -196,6 +196,9 @@ class ProjectEulerOfflineApp:
                 [
                     "latexmk",
                     "-xelatex",
+                    "-file-line-error",
+                    "-interaction=nonstopmode",
+                    "-silent",
                     str(output_latex_path.relative_to(self._output_path)),
                 ],
                 cwd=str(self._output_path),

@@ -45,6 +45,7 @@ LATEX_BLOCK_STYLES = {
 
 LATEX_CHARACTER_SUBSTITUTIONS = {
     "’": r"\textquoteright{}",
+    "\u2009": r"\,",
     "⌈": r"\ensuremath{⌈}",
     "⌉": r"\ensuremath{⌉}",
     "⌊": r"\ensuremath{⌊}",
@@ -71,7 +72,6 @@ LATEX_CHARACTER_SUBSTITUTIONS = {
     "⑦": r"\circled{7}",
     "⑧": r"\circled{8}",
     "⑨": r"\circled{9}",
-    "ń": r"\'{n}",
     "μ": r"\ensuremath{μ}",
     "π": r"\ensuremath{π}",
     "ω": r"\ensuremath{ω}",
@@ -234,6 +234,16 @@ class DocumentBuilder:
             substitution = substitution.replace("&amp;", r"&")
             substitution = substitution.replace("&lt;", r"<")
             substitution = substitution.replace("&gt;", r">")
+            # Project Euler's MathJax sources occasionally use text-mode size
+            # commands inside math (e.g. `$\large \left\lfloor ... \right\rfloor$`
+            # in problem 372). These trigger "invalid in math mode" warnings;
+            # strip them since LaTeX's auto-sizing is sufficient.
+            substitution = re.sub(
+                r"\\(?:tiny|scriptsize|footnotesize|small|normalsize|large|huge)\b\s?",
+                "",
+                substitution,
+                flags=re.IGNORECASE,
+            )
             document_latex = document_latex.replace(marker, substitution)
 
         for marker, footnote_text in self._tooltip_footnotes.items():
@@ -508,16 +518,13 @@ class DocumentBuilder:
             problem_soup.title.text,
         )
         problem_title = html_title_to_latex(title_match.group('problem_name'))
-        problem_title_bookmark = re.sub(
-            r"\$([^$]+)\$",
-            r"\\texorpdfstring{$\1$}{\1}",
-            problem_title,
-        )
 
         # TODO: Problem ID in section numbering should be explicit
         # TODO: Problem title should link to problem URL
+        # Math expressions in the [...] arg get wrapped with \texorpdfstring
+        # in a single global pass during write() — see _wrap_section_bookmarks.
         problem_content_latex = (
-            f"\\section[Problem \\#{problem_id}: {problem_title_bookmark}]{{{problem_title}}}\n"
+            f"\\section[Problem \\#{problem_id}: {problem_title}]{{{problem_title}}}\n"
             + f"\\label{{sec:problem_{problem_id}}}\n\n"
             + self._transform_html_to_latex(problem_content_html)
         )
@@ -561,6 +568,29 @@ class DocumentBuilder:
             flags=re.DOTALL | re.MULTILINE,
         )
 
+        # Wrap math in \section[...] bookmark args with \texorpdfstring so
+        # hyperref doesn't warn about math-syntax tokens (^ _ $) when building
+        # PDF bookmarks. Plain-text fallback strips those tokens. Skips entries
+        # already wrapped to keep the pass idempotent across source mods.
+        def _wrap_section_bookmark(match):
+            bracket = match.group(1)
+            if r"\texorpdfstring" in bracket:
+                return match.group(0)
+
+            wrapped = re.sub(
+                r"\$([^$]+)\$",
+                lambda m: rf"\texorpdfstring{{${m.group(1)}$}}{{{re.sub(r'[\^_\$]', '', m.group(1))}}}",
+                bracket,
+            )
+
+            return rf"\section[{wrapped}]"
+
+        output_latex_content = re.sub(
+            r"\\section\[([^\]]*)\]",
+            _wrap_section_bookmark,
+            output_latex_content,
+        )
+
         template_path = Path(__file__).parent / "template.tex"
         template = Template(template_path.read_text())
 
@@ -578,6 +608,16 @@ class DocumentBuilder:
 
         for character, substitution in LATEX_CHARACTER_SUBSTITUTIONS.items():
             output_latex = output_latex.replace(character, substitution)
+
+        # Wrap runs of CJK characters in a CJK-capable font (defined in
+        # template.tex as \PandocCJKFont). Covers Han ideographs, Hiragana,
+        # Katakana, and Hangul. Without this, latinmodern emits "Missing
+        # character" warnings for problem 837's "阿弥陀籤" and similar.
+        output_latex = re.sub(
+            r"([\u3000-\u303F\u3040-\u309F\u30A0-\u30FF\u3400-\u4DBF\u4E00-\u9FFF\uAC00-\uD7AF\uF900-\uFAFF\uFF00-\uFFEF]+)",
+            r"{\\PandocCJKFont{}\1}",
+            output_latex,
+        )
 
         output_latex_path = output_path / (build_name + ".tex")
         output_latex_path.write_text(output_latex)

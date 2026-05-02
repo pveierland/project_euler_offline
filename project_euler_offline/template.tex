@@ -1,7 +1,7 @@
 \documentclass[]{article}
 
 \usepackage{fontspec}
-\setmainfont{Latin Modern Roman}
+\setmainfont{Latin Modern Roman}[SmallCapsFont={Latin Modern Roman Caps}]
 \usepackage{unicode-math}
 \usepackage[a4paper, top=3cm, bottom=3cm, left=2.5cm, right=2.5cm]{geometry}
 
@@ -37,6 +37,9 @@
   \def\ensuremath#1{#1}%
   \def\mathcal#1{#1}%
   \def\symcal#1{#1}%
+  \def\sqrt{sqrt }%
+  \def\textsuperscript#1{#1}%
+  \def\textsubscript#1{#1}%
   \def\times{x}%
 }
 
@@ -44,6 +47,25 @@
 \renewcommand{\textasciicircum}{\ifmmode\string^\else\origtextasciicircum\fi}
 \let\origtextasciitilde\textasciitilde
 \renewcommand{\textasciitilde}{\ifmmode\sim\else\origtextasciitilde\fi}
+
+% MathJax in Project Euler problem sources occasionally emits \unicode{xXXXX}
+% (e.g. problem 991 uses emoji as math variables). Plain LaTeX has no such
+% command, so define one that selects an emoji-capable font and emits the
+% codepoint via \char. \mbox escapes math mode (where \char is 16-bit-limited
+% in XeTeX) so codepoints above U+FFFF render. The font is provided by the
+% Nix devshell via fontconfig (see flake.nix).
+\newfontfamily{\PandocEmojiFont}{Noto Emoji}
+
+% CJK font fallback for Han/Kana characters that latinmodern lacks (e.g.
+% problem 837's "阿弥陀籤"). Provided by the Nix devshell via fontconfig.
+\newfontfamily{\PandocCJKFont}{Noto Sans CJK SC}
+\providecommand{\unicode}[1]{\PandocUnicodeParse#1\relax}
+\def\PandocUnicodeParse x#1\relax{\mbox{{\PandocEmojiFont\char"#1\relax}}}
+
+% Latin Modern Math (the default unicode-math font) does not include U+2605
+% (★) used by \bigstar. Fall back to the smaller \star glyph, which it does
+% include, to silence "Missing character" warnings (e.g. problem 956).
+\AtBeginDocument{\let\bigstar\star}
 
 \title{Project Euler Offline}
 \author{Project Euler Offline}
@@ -70,7 +92,12 @@
 \newcommand{\gt}{>}
 \newcommand{\lt}{<}
 \newcommand{\enclose}[2]{\circled{$$#2$$}}
-\newcommand{\pu}[1]{\ensuremath{\mathrm{#1}}}
+% \pu{...} renders MathJax-style physical units. \mathrm uses the text
+% rmfamily for its content, so plain \mu inside it tries to render U+1D707
+% in Latin Modern Roman (which lacks it). Locally redefine \mu to U+00B5
+% (MICRO SIGN, visually identical), which is in Latin-1 Supplement and
+% present in Latin Modern Roman. Fixes e.g. problem 155's \pu{60 \mu F}.
+\newcommand{\pu}[1]{{\ensuremath{\mathrm{\def\mu{\char"00B5\relax}#1}}}}
 
 % PAGE STYLING
 
