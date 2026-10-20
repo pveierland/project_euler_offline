@@ -17,6 +17,13 @@
 \usepackage{longtable}
 \usepackage{ragged2e}
 \usepackage{soul}
+% Use a Unicode analysis font for accented headings such as "Sierpiński".
+% Fix its size to keep soul's summed character widths exact during reconstruction.
+\makeatletter
+\font\SOUL@tt="Latin Modern Mono" at 10pt
+\setbox\z@\hbox{\SOUL@tt-}
+\SOUL@ttwidth=\wd\z@
+\makeatother
 \usepackage{textcomp}
 \usepackage{tikz}
 \usepackage[explicit]{titlesec}
