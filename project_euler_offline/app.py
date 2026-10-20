@@ -3,6 +3,7 @@ import asyncio
 import logging
 import subprocess
 from pathlib import Path
+from urllib.parse import urljoin
 
 import pydash
 from bs4 import BeautifulSoup
@@ -21,13 +22,29 @@ class ProjectEulerOfflineApp:
     COMMANDS = ["fetch", "render"]
 
     def _retrieve_http_data(self, url_path, **kwargs):
-        return asyncio.run(
-            self._http_cache.retrieve_data(self._args.base_url + url_path, **kwargs)
-        )
+        request_url = urljoin(self._args.base_url, url_path)
+        legacy_url = self._args.base_url + url_path
+
+        if request_url != legacy_url and not (
+            kwargs.get("cache_disable") or kwargs.get("force")
+        ):
+            # Older caches use the original concatenated URL as their key.
+            for cache_url in (request_url, legacy_url):
+                data = asyncio.run(
+                    self._http_cache.retrieve_data(cache_url, cache_only=True)
+                )
+                if data is not None:
+                    return data
+
+            if kwargs.get("cache_only"):
+                return None
+
+        return asyncio.run(self._http_cache.retrieve_data(request_url, **kwargs))
 
     def _write_http_resource(self, url_path, store_in_base=False, **kwargs):
         data = self._retrieve_http_data(url_path, **kwargs)
-        clean_path = url_path.split("?")[0]
+        # A root-relative URL still belongs beneath the local output directory.
+        clean_path = url_path.split("?")[0].lstrip("/")
         path = self._output_path / (
             Path(clean_path).name if store_in_base else Path(clean_path)
         )

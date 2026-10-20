@@ -599,10 +599,12 @@ class DocumentBuilder:
             content=output_latex_content,
         )
 
-        # Strip query strings from includegraphics paths:
+        # Match the local download paths for root-relative URLs and query strings:
         output_latex = re.sub(
-            r"(\\includegraphics(\[[^\]]*\])?{[^}?]+)\?[^}]*(})",
-            r"\1\3",
+            r"(\\includegraphics(?:\[[^\]]*\])?{)(?P<path>[^}]+)}",
+            lambda match: match.group(1)
+            + match.group("path").split("?")[0].lstrip("/")
+            + "}",
             output_latex,
         )
 

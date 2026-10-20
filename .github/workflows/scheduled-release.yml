@@ -19,6 +19,9 @@ jobs:
           extra_nix_config: |
             experimental-features = nix-command flakes
 
+      - name: Run regression tests
+        run: nix develop --command python -m unittest discover -v
+
       - name: Restore HTTP cache
         uses: actions/cache@v4
         with:
